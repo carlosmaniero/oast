@@ -1,0 +1,9 @@
+productions  := production+ ws* productions*
+production   := head ws* "=" ws* body ws* ";"
+head         := any-string
+body         := (any-string | literal | regex | "(" ws* body ws* ")") (ws* "|" ws* body)*
+ws           := " " | "\n"
+any-string   := (#'[a-z]' | #'[0-9]')+
+regex        := "/" (any-string | "[" any-string "]") "/"
+literal      := double-quote any-string double-quote
+double-quote := #'["]'
