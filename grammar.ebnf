@@ -1,9 +1,12 @@
 productions  := production+ ws* productions*
-production   := head ws* "=" ws* body ws* ";"
+production   := (head ws* "=" ws* body ws* ";") | comment
 head         := any-string
-body         := (any-string | literal | regex | "(" ws* body ws* ")") (ws* "|" ws* body)*
+body         := ((any-string | literal | regex | p-body) or-body) comment?
+p-body       := "(" ws* body ws* ")"
+or-body      := (ws* "|" ws* body)*
 ws           := " " | "\n"
 any-string   := (#'[a-z]' | #'[0-9]')+
 regex        := "/" (any-string | "[" any-string "]") "/"
 literal      := double-quote any-string double-quote
+comment      := "%" #'.*' "\n"?
 double-quote := #'["]'
