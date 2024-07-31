@@ -15,10 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "arena.h"
+#include "lexer.h"
+#include "ref.h"
 
 void print_help(void);
 void print_unknown();
+void dump_tokens(char* grammar_path);
+char* load_file(arena_t* arena, char* file_path);
 
 int main(int args, char** argsv) {
   if (args < 2 || strcmp(argsv[1], "help") == 0) {
@@ -26,8 +32,40 @@ int main(int args, char** argsv) {
     return 0;
   }
 
+  if (args > 2 || strcmp(argsv[1], "dump-tokens") == 0) {
+    dump_tokens(argsv[2]);
+    return 0;
+  }
+
   print_unknown();
   return 1;
+}
+
+void dump_tokens(char* grammar_path) {
+  arena_t arena = arena_new(1024 * 1024 * 4);
+
+  struct ref_source source = {
+    .path = grammar_path,
+    .contents = load_file(&arena, grammar_path),
+  };
+
+  struct lexer lexer;
+
+  lexer_init(&lexer, source);
+
+  struct token token = {0};
+
+  while (token.kind != TOKEN_EOF) {
+    lexer_next_token(&lexer, &token);
+
+    printf(
+        "%s:%ld:%ld:%s: " FMT_TOKEN_VALUE_FORMATER "\n",
+        token.ref.source.path,
+        token.ref.cursor.row + 1,
+        token.ref.cursor.col + 1,
+        lexer_token_kind_to_str(token.kind),
+        FMT_TOKEN_VALUE(token));
+  }
 }
 
 void print_help() {
@@ -53,4 +91,32 @@ void print_unknown() {
   puts("error: invalid invocation!\n");
 
   print_help();
+}
+
+char* load_file(arena_t* arena, char* file_path) {
+  FILE* file = fopen(file_path, "r");
+
+  if (!file) {
+      perror("Error opening file");
+      exit(1);
+  }
+
+  fseek(file, 0, SEEK_END);
+  long length = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  char* buffer = arena_alloc(arena, length + 1);
+
+  if (!buffer) {
+      fclose(file);
+      perror("Memory allocation failed");
+      exit(1);
+  }
+
+  size_t bytesRead = fread(buffer, 1, length, file);
+  fclose(file);
+
+  buffer[bytesRead] = '\0';
+
+  return buffer;
 }
