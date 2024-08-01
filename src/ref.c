@@ -19,3 +19,7 @@
 char ref_char(struct ref* ref) {
   return *(ref->source.contents + ref->cursor.offset);
 }
+
+int ref_distance(struct ref* ref, struct ref* other) {
+  return ref->cursor.offset - other->cursor.offset;
+}

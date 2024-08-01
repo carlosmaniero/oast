@@ -22,8 +22,7 @@
 #define WALKER_H
 
 struct walker {
-  struct ref_source source;
-  struct ref_cursor cursor;
+  struct ref ref;
 };
 
 void walker_init(struct walker* walker, struct ref_source source);

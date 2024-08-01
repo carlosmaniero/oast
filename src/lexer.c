@@ -46,7 +46,7 @@ int lexer_isalnum(struct ref* ref) {
 }
 
 void lexer_set_token_length(struct lexer* lexer, struct token* token) {
-  token->length = lexer->walker.cursor.offset - token->ref.cursor.offset;
+  token->length = ref_distance(&lexer->walker.ref, &token->ref);
 }
 
 void lexer_next_token(struct lexer* lexer, struct token* token) {

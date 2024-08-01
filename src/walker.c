@@ -20,11 +20,11 @@ void walker_next_cursor(struct walker* walker);
 void walker_cursor_to_ref(struct walker* walker, struct ref* ref);
 
 void walker_init(struct walker* walker, struct ref_source source) {
-  walker->source = source;
+  walker->ref.source = source;
 
-  walker->cursor.offset = 0;
-  walker->cursor.row = 0;
-  walker->cursor.col = 0;
+  walker->ref.cursor.offset = 0;
+  walker->ref.cursor.row = 0;
+  walker->ref.cursor.col = 0;
 }
 
 void walker_walk(struct walker* walker, struct ref* ref) {
@@ -51,16 +51,15 @@ void walker_next_cursor(struct walker* walker) {
   walker_cursor_to_ref(walker, &ref);
 
   if (ref_char(&ref) == '\n') {
-    walker->cursor.row++;
-    walker->cursor.col = 0;
+    walker->ref.cursor.row++;
+    walker->ref.cursor.col = 0;
   } else {
-    walker->cursor.col++;
+    walker->ref.cursor.col++;
   }
 
-  walker->cursor.offset++;
+  walker->ref.cursor.offset++;
 }
 
 void walker_cursor_to_ref(struct walker* walker, struct ref* ref) {
-  ref->source = walker->source;
-  ref->cursor = walker->cursor;
+  *ref = walker->ref;
 }

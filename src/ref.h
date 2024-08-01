@@ -39,4 +39,6 @@ struct ref {
 
 char ref_char(struct ref* ref);
 
+int ref_distance(struct ref* ref, struct ref* other);
+
 #endif
