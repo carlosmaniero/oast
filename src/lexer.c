@@ -67,6 +67,12 @@ void lexer_next_token(struct lexer* lexer, struct token* token) {
     return;
   }
 
+  if (token_char == '=') {
+    token->kind = TOKEN_EQUAL;
+    lexer_set_token_length(lexer, token);
+    return;
+  };
+
   if (isalpha(token_char)) {
     walker_walk_while(&lexer->walker, &lexer_isalnum);
 
@@ -85,6 +91,8 @@ char* lexer_token_kind_to_str(enum token_kind kind) {
       return "TOKEN_UNKNOWN";
     case TOKEN_IDENTIFIER:
       return "TOKEN_IDENTIFIER";
+    case TOKEN_EQUAL:
+      return "TOKEN_EQUAL";
     case TOKEN_EOF:
       return "TOKEN_EOF";   
   }

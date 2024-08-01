@@ -2,5 +2,5 @@
 answer0 = "42"
 
 % expect-token %examples/01-single-literal.oast:2:1:TOKEN_IDENTIFIER:answer0
-% expect-token %examples/01-single-literal.oast:2:9:TOKEN_UNKNOWN:=
+% expect-token %examples/01-single-literal.oast:2:9:TOKEN_EQUAL:=
 % expect-token %examples/01-single-literal.oast:2:11:TOKEN_UNKNOWN:"42"
