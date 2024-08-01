@@ -19,6 +19,11 @@ $(BUILD_DIR):
 .PHONY: clean
 clean:
 	@rm -rf build/ $(TARGET)
+	make -C tests clean
+
+.PHONY: test
+test:
+	make -C tests
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
