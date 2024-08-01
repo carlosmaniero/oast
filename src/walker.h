@@ -33,4 +33,6 @@ typedef int (*walker_predicate_t)(struct ref* ref);
 
 void walker_walk_while(struct walker* walker, walker_predicate_t predicate);
 
+void walker_next_cursor(struct walker* walker);
+
 #endif

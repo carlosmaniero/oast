@@ -38,7 +38,7 @@ void walker_walk_while(struct walker* walker, walker_predicate_t predicate) {
   while(1) {
     walker_cursor_to_ref(walker, &ref);
 
-    if (!predicate(&ref)) {
+    if (!predicate(&ref) || ref_char(&ref) == 0) {
       break;
     }
 

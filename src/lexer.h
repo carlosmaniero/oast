@@ -34,6 +34,7 @@ enum token_kind
 
     TOKEN_IDENTIFIER,
     TOKEN_EQUAL,
+    TOKEN_STRING,
 
     TOKEN_EOF
 };

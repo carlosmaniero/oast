@@ -20,6 +20,7 @@
 
 int lexer_not_space_predicate(struct ref* ref);
 int lexer_not_lf(struct ref* ref);
+int lexer_not_dquote(struct ref* ref);
 int lexer_isspace_predicate(struct ref* ref);
 int lexer_isalnum(struct ref* ref);
 
@@ -39,6 +40,10 @@ int lexer_isspace_predicate(struct ref* ref) {
 
 int lexer_not_lf(struct ref* ref) {
   return ref_char(ref) != '\n';
+}
+
+int lexer_not_dquote(struct ref* ref) {
+  return ref_char(ref) != '"';
 }
 
 int lexer_isalnum(struct ref* ref) {
@@ -73,6 +78,19 @@ void lexer_next_token(struct lexer* lexer, struct token* token) {
     return;
   };
 
+  if (token_char == '"') {
+    token->kind = TOKEN_STRING;
+
+    walker_walk_while(&lexer->walker, &lexer_not_dquote);
+    walker_next_cursor(&lexer->walker);
+
+    // TODO: it is assuming the string is always valid
+    //
+    // add an unmatching quotes validation
+    lexer_set_token_length(lexer, token);
+    return;
+  };
+
   if (isalpha(token_char)) {
     walker_walk_while(&lexer->walker, &lexer_isalnum);
 
@@ -93,6 +111,8 @@ char* lexer_token_kind_to_str(enum token_kind kind) {
       return "TOKEN_IDENTIFIER";
     case TOKEN_EQUAL:
       return "TOKEN_EQUAL";
+    case TOKEN_STRING:
+      return "TOKEN_STRING";
     case TOKEN_EOF:
       return "TOKEN_EOF";   
   }
