@@ -19,6 +19,7 @@
 #include "ctype.h"
 
 int lexer_not_space_predicate(struct ref* ref);
+int lexer_not_lf(struct ref* ref);
 int lexer_isspace_predicate(struct ref* ref);
 
 void lexer_init(struct lexer* lexer, struct ref_source source) {
@@ -33,18 +34,29 @@ int lexer_isspace_predicate(struct ref* ref) {
   return isspace(ref_char(ref));
 }
 
+int lexer_not_lf(struct ref* ref) {
+  return ref_char(ref) != '\n';
+}
+
 void lexer_next_token(struct lexer* lexer, struct token* token) {
+  walker_walk_while(&lexer->walker, &lexer_isspace_predicate);
   walker_walk(&lexer->walker, &token->ref);
 
-  if (ref_char(&token->ref) == 0) {
+  char token_char = ref_char(&token->ref);
+
+  if (token_char == 0) {
     token->kind = TOKEN_EOF;
   };
+
+  if (token_char == '%') {
+    walker_walk_while(&lexer->walker, &lexer_not_lf);
+    lexer_next_token(lexer, token);
+    return;
+  }
 
   walker_walk_while(&lexer->walker, &lexer_not_space_predicate);
 
   token->length = lexer->walker.cursor.offset - token->ref.cursor.offset;
-
-  walker_walk_while(&lexer->walker, &lexer_isspace_predicate);
 }
 
 char* lexer_token_kind_to_str(enum token_kind kind) {

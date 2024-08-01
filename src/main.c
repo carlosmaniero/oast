@@ -59,7 +59,7 @@ void dump_tokens(char* grammar_path) {
     lexer_next_token(&lexer, &token);
 
     printf(
-        "%s:%ld:%ld:%s: " FMT_TOKEN_VALUE_FORMATER "\n",
+        "%s:%ld:%ld:%s:" FMT_TOKEN_VALUE_FORMATER "\n",
         token.ref.source.path,
         token.ref.cursor.row + 1,
         token.ref.cursor.col + 1,
