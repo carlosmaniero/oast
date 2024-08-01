@@ -32,6 +32,8 @@ enum token_kind
 {
     TOKEN_UNKNOWN,
 
+    TOKEN_IDENTIFIER,
+
     TOKEN_EOF
 };
 
