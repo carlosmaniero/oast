@@ -1,9 +1,23 @@
+% Copyright (C) 2024 Carlos Maniero <carlos@maniero.me>
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <https://www.gnu.org/licenses/>.
 % spec %A simple grammar that only accepts 42
 answer0 = "42"
 
-% expect-token %examples/01-single-literal.oast:2:1:TOKEN_IDENTIFIER:answer0
-% expect-token %examples/01-single-literal.oast:2:9:TOKEN_EQUAL:=
-% expect-token %examples/01-single-literal.oast:2:11:TOKEN_STRING:"42"
+% expect-token %examples/01-single-literal.oast:16:1:TOKEN_IDENTIFIER:answer0
+% expect-token %examples/01-single-literal.oast:16:9:TOKEN_EQUAL:=
+% expect-token %examples/01-single-literal.oast:16:11:TOKEN_STRING:"42"
 
 % ast %AST
 % ast %- PRODUCTION:
