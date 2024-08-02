@@ -19,11 +19,13 @@
 #include <string.h>
 #include "arena.h"
 #include "lexer.h"
+#include "parser.h"
 #include "ref.h"
 
 void print_help(void);
 void print_unknown();
 void dump_tokens(char* grammar_path);
+void dump_ast(char* grammar_path);
 char* load_file(arena_t* arena, char* file_path);
 
 int main(int args, char** argsv) {
@@ -32,13 +34,54 @@ int main(int args, char** argsv) {
     return 0;
   }
 
-  if (args > 2 || strcmp(argsv[1], "dump-tokens") == 0) {
+  if (args > 2 && strcmp(argsv[1], "dump-tokens") == 0) {
     dump_tokens(argsv[2]);
+    return 0;
+  }
+
+  if (args > 2 && strcmp(argsv[1], "dump-ast") == 0) {
+    dump_ast(argsv[2]);
     return 0;
   }
 
   print_unknown();
   return 1;
+}
+
+void dump_ast(char* grammar_path) {
+  arena_t arena = arena_new(1024 * 1024 * 4);
+
+  struct ref_source source = {
+    .path = grammar_path,
+    .contents = load_file(&arena, grammar_path),
+  };
+
+  struct lexer lexer;
+
+  lexer_init(&lexer, source);
+
+  struct parser parser;
+
+  parser_init(&parser, &arena);
+
+  struct ast* ast = parser_parse(&parser, &lexer);
+
+  puts("AST");
+
+  list_item_t* item = list_head(&ast->productions);
+
+  while (item) {
+    struct ast_production* production = item->value;
+    printf("- PRODUCTION:");
+
+    printf("\n  - HEAD:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->head.token));
+    printf("\n  - BODY:");
+    printf("\n    - KIND:LITERAL");
+    printf("\n    - VALUE:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->body.data.literal.token));
+
+    printf("\n");
+    item = list_next(item);
+  }
 }
 
 void dump_tokens(char* grammar_path) {
@@ -78,6 +121,7 @@ void print_help() {
     "Commands:\n"
     "  help        Display this help message\n"
     "  dump-tokens Dump tokens from an OAST grammar file\n"
+    "  dump-ast    Dump AST from an OAST grammar file\n"
     "  check       Test an OAST grammar file against a source\n"
     "\n"
     "Examples:\n"

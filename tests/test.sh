@@ -4,8 +4,8 @@ TEST_FILE="$1"
 
 TEST_TMP_FILES="$TEST_FILE.test"
 
-TOKENS_OUTPUT_FILE="$TEST_FILE.test.tokens_output"
-TOKENS_EXPECT_OUTPUT_FILE="$TEST_FILE.test.expected_tokens_output"
+AST_OUTPUT_FILE="$TEST_FILE.test.ast_output"
+AST_EXPECT_OUTPUT_FILE="$TEST_FILE.test.expected_ast_output"
 
 TOKENS_OUTPUT_FILE="$TEST_FILE.test.tokens_output"
 TOKENS_EXPECT_OUTPUT_FILE="$TEST_FILE.test.expected_tokens_output"
@@ -102,6 +102,32 @@ expect_output() {
   done < "$expected_file"
 }
 
+diff_output() {
+  context="$1"
+  actual_file="$2"
+  expected_file="$3"
+
+  if [ "$(wc -l < "$expected_file")" = "0" ]; then
+    print_skiped "$context"
+    return
+  fi
+
+  if cmp -s "$expected_file" "$actual_file"; then
+    return
+  fi
+
+  if [ "$(cat "$expected_file")" = "%empty%" ]; then
+    if [ "$(wc -c < "$actual_file")" = "0" ]; then
+       return
+    fi
+  fi
+
+  colored "$context not match:" $COLOR_YELLOW
+  echo ""
+  diff "$actual_file" "$expected_file" -u --color
+  exit 1
+}
+
 test_tokens() {
   extract_comment "expect-token" > "$TOKENS_EXPECT_OUTPUT_FILE"
 
@@ -112,11 +138,22 @@ test_tokens() {
   print_passed expect-token
 }
 
+test_ast() {
+  extract_comment "ast" > "$AST_EXPECT_OUTPUT_FILE"
+
+  $OAST_PATH dump-ast "$TEST_FILE" > "$AST_OUTPUT_FILE" 2>&1
+
+  diff_output "ast" "$AST_OUTPUT_FILE" "$AST_EXPECT_OUTPUT_FILE"
+
+  print_passed ast
+}
+
 
 main() {
   print_test_description
 
   test_tokens
+  test_ast
 
   cleanup
 }
