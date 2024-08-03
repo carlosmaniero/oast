@@ -21,18 +21,18 @@
 #ifndef WALKER_H
 #define WALKER_H
 
-struct walker {
-  struct ref ref;
-};
+typedef struct walker {
+  ref_t ref;
+} walker_t;
 
-void walker_init(struct walker* walker, struct ref_source source);
+void walker_init(walker_t* walker, ref_source_t source);
 
-void walker_walk(struct walker* walker, struct ref* ref);
+void walker_walk(walker_t* walker, ref_t* ref);
 
-typedef int (*walker_predicate_t)(struct ref* ref);
+typedef int (*walker_predicate_t)(ref_t* ref);
 
-void walker_walk_while(struct walker* walker, walker_predicate_t predicate);
+void walker_walk_while(walker_t* walker, walker_predicate_t predicate);
 
-void walker_next_cursor(struct walker* walker);
+void walker_next_cursor(walker_t* walker);
 
 #endif

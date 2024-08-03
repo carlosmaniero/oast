@@ -16,10 +16,10 @@
  */
 #include "walker.h"
 
-void walker_next_cursor(struct walker* walker);
-void walker_cursor_to_ref(struct walker* walker, struct ref* ref);
+void walker_next_cursor(walker_t* walker);
+void walker_cursor_to_ref(walker_t* walker, ref_t* ref);
 
-void walker_init(struct walker* walker, struct ref_source source) {
+void walker_init(walker_t* walker, ref_source_t source) {
   walker->ref.source = source;
 
   walker->ref.cursor.offset = 0;
@@ -27,13 +27,13 @@ void walker_init(struct walker* walker, struct ref_source source) {
   walker->ref.cursor.col = 0;
 }
 
-void walker_walk(struct walker* walker, struct ref* ref) {
+void walker_walk(walker_t* walker, ref_t* ref) {
   walker_cursor_to_ref(walker, ref);
   walker_next_cursor(walker);
 }
 
-void walker_walk_while(struct walker* walker, walker_predicate_t predicate) {
-  struct ref ref;
+void walker_walk_while(walker_t* walker, walker_predicate_t predicate) {
+  ref_t ref;
 
   while(1) {
     walker_cursor_to_ref(walker, &ref);
@@ -46,8 +46,8 @@ void walker_walk_while(struct walker* walker, walker_predicate_t predicate) {
   }
 }
 
-void walker_next_cursor(struct walker* walker) {
-  struct ref ref;
+void walker_next_cursor(walker_t* walker) {
+  ref_t ref;
   walker_cursor_to_ref(walker, &ref);
 
   if (ref_char(&ref) == '\n') {
@@ -60,6 +60,6 @@ void walker_next_cursor(struct walker* walker) {
   walker->ref.cursor.offset++;
 }
 
-void walker_cursor_to_ref(struct walker* walker, struct ref* ref) {
+void walker_cursor_to_ref(walker_t* walker, ref_t* ref) {
   *ref = walker->ref;
 }

@@ -20,25 +20,25 @@
 #ifndef REF_H
 #define REF_H
 
-struct ref_source {
+typedef struct ref_source {
   char* path;
   char* contents;
-};
+} ref_source_t;
 
-struct ref_cursor
+typedef struct ref_cursor
 {
     size_t offset;
     size_t row;
     size_t col;
-};
+} ref_cursor_t;
 
-struct ref {
-  struct ref_source source;
-  struct ref_cursor cursor;
-};
+typedef struct ref {
+  ref_source_t source;
+  ref_cursor_t cursor;
+} ref_t;
 
-char ref_char(struct ref* ref);
+char ref_char(ref_t* ref);
 
-int ref_distance(struct ref* ref, struct ref* other);
+int ref_distance(ref_t* ref, ref_t* other);
 
 #endif

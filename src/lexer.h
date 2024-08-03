@@ -23,12 +23,12 @@
 #define FMT_TOKEN_VALUE_FORMATER "%.*s"
 #define FMT_TOKEN_VALUE(sv) (int)(sv).length, (sv).ref.source.contents + (sv).ref.cursor.offset
 
-struct lexer
+typedef struct lexer
 {
-  struct walker walker;
-};
+  walker_t walker;
+} lexer_t;
 
-enum token_kind
+typedef enum token_kind
 {
     TOKEN_UNKNOWN,
 
@@ -37,19 +37,19 @@ enum token_kind
     TOKEN_STRING,
 
     TOKEN_EOF
-};
+} token_kind_t;
 
-struct token
+typedef struct token
 {
     enum token_kind kind;
     size_t length;
-    struct ref ref;
-};
+    ref_t ref;
+} token_t;
 
-void lexer_init(struct lexer* lexer, struct ref_source source);
+void lexer_init(lexer_t* lexer, ref_source_t source);
 
-void lexer_next_token(struct lexer* lexer, struct token* token);
+void lexer_next_token(lexer_t* lexer, token_t* token);
 
-char* lexer_token_kind_to_str(enum token_kind kind);
+char* lexer_token_kind_to_str(token_kind_t kind);
 
 #endif /* LEXER_H */

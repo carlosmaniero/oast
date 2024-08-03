@@ -51,27 +51,27 @@ int main(int args, char** argsv) {
 void dump_ast(char* grammar_path) {
   arena_t arena = arena_new(1024 * 1024 * 4);
 
-  struct ref_source source = {
+  ref_source_t source = {
     .path = grammar_path,
     .contents = load_file(&arena, grammar_path),
   };
 
-  struct lexer lexer;
+  lexer_t lexer;
 
   lexer_init(&lexer, source);
 
-  struct parser parser;
+  parser_t parser;
 
   parser_init(&parser, &arena);
 
-  struct ast* ast = parser_parse(&parser, &lexer);
+  ast_t* ast = parser_parse(&parser, &lexer);
 
   puts("AST");
 
   list_item_t* item = list_head(&ast->productions);
 
   while (item) {
-    struct ast_production* production = item->value;
+    ast_production_t* production = item->value;
     printf("- PRODUCTION:");
 
     printf("\n  - HEAD:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->head.token));
@@ -87,16 +87,16 @@ void dump_ast(char* grammar_path) {
 void dump_tokens(char* grammar_path) {
   arena_t arena = arena_new(1024 * 1024 * 4);
 
-  struct ref_source source = {
+  ref_source_t source = {
     .path = grammar_path,
     .contents = load_file(&arena, grammar_path),
   };
 
-  struct lexer lexer;
+  lexer_t lexer;
 
   lexer_init(&lexer, source);
 
-  struct token token = {0};
+  token_t token = {0};
 
   while (token.kind != TOKEN_EOF) {
     lexer_next_token(&lexer, &token);

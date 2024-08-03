@@ -16,10 +16,10 @@
  */
 #include "ref.h"
 
-char ref_char(struct ref* ref) {
+char ref_char(ref_t* ref) {
   return *(ref->source.contents + ref->cursor.offset);
 }
 
-int ref_distance(struct ref* ref, struct ref* other) {
+int ref_distance(ref_t* ref, ref_t* other) {
   return ref->cursor.offset - other->cursor.offset;
 }

@@ -19,12 +19,12 @@
 #include "ast.h"
 #ifndef PARSER_H
 #define PARSER_H
-struct parser {
-  struct arena* arena;
-};
+typedef struct parser {
+  arena_t* arena;
+} parser_t;
 
-void parser_init(struct parser* parser, struct arena* arena);
+void parser_init(parser_t* parser, arena_t* arena);
 
-struct ast* parser_parse(struct parser* parser, struct lexer* lexer);
+ast_t* parser_parse(parser_t* parser, lexer_t* lexer);
 
 #endif

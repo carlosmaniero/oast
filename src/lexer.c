@@ -18,43 +18,43 @@
 #include "assert.h"
 #include "ctype.h"
 
-int lexer_not_space_predicate(struct ref* ref);
-int lexer_not_lf(struct ref* ref);
-int lexer_not_dquote(struct ref* ref);
-int lexer_isspace_predicate(struct ref* ref);
-int lexer_isalnum(struct ref* ref);
+int lexer_not_space_predicate(ref_t* ref);
+int lexer_not_lf(ref_t* ref);
+int lexer_not_dquote(ref_t* ref);
+int lexer_isspace_predicate(ref_t* ref);
+int lexer_isalnum(ref_t* ref);
 
-void lexer_set_token_length(struct lexer* lexer, struct token* token);
+void lexer_set_token_length(lexer_t* lexer, token_t* token);
 
-void lexer_init(struct lexer* lexer, struct ref_source source) {
+void lexer_init(lexer_t* lexer, ref_source_t source) {
   walker_init(&lexer->walker, source);
 }
 
-int lexer_not_space_predicate(struct ref* ref) {
+int lexer_not_space_predicate(ref_t* ref) {
   return !isspace(ref_char(ref));
 }
 
-int lexer_isspace_predicate(struct ref* ref) {
+int lexer_isspace_predicate(ref_t* ref) {
   return isspace(ref_char(ref));
 }
 
-int lexer_not_lf(struct ref* ref) {
+int lexer_not_lf(ref_t* ref) {
   return ref_char(ref) != '\n';
 }
 
-int lexer_not_dquote(struct ref* ref) {
+int lexer_not_dquote(ref_t* ref) {
   return ref_char(ref) != '"';
 }
 
-int lexer_isalnum(struct ref* ref) {
+int lexer_isalnum(ref_t* ref) {
   return isalnum(ref_char(ref));
 }
 
-void lexer_set_token_length(struct lexer* lexer, struct token* token) {
+void lexer_set_token_length(lexer_t* lexer, token_t* token) {
   token->length = ref_distance(&lexer->walker.ref, &token->ref);
 }
 
-void lexer_next_token(struct lexer* lexer, struct token* token) {
+void lexer_next_token(lexer_t* lexer, token_t* token) {
   token->kind = TOKEN_UNKNOWN;
 
   walker_walk_while(&lexer->walker, &lexer_isspace_predicate);

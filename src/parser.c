@@ -16,17 +16,17 @@
  */
 #include "parser.h"
 
-void parser_init(struct parser* parser, struct arena* arena) {
+void parser_init(parser_t* parser, arena_t* arena) {
   parser->arena = arena;
 }
 
-struct ast* parser_parse(struct parser* parser, struct lexer* lexer) {
-  struct ast* root = arena_alloc(parser->arena, sizeof(struct ast));
+ast_t* parser_parse(parser_t* parser, lexer_t* lexer) {
+  ast_t* root = arena_alloc(parser->arena, sizeof(ast_t));
 
   root->productions = (list_t){0};
   root->productions.arena = parser->arena;
 
-  struct ast_production* production = arena_alloc(parser->arena, sizeof(struct ast_production));
+  ast_production_t* production = arena_alloc(parser->arena, sizeof(ast_production_t));
 
   lexer_next_token(lexer, &production->head.token);
   production->body.kind = AST_PRODUCTION_BODY_KIND_LITERAL;

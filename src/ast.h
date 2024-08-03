@@ -17,34 +17,34 @@
 #include "list.h"
 #ifndef AST_H
 #define AST_H
-struct ast {
+typedef struct ast {
   // List of ast_productions
   list_t productions;
-};
+} ast_t;
 
-struct ast_production_head {
-  struct token token;
-};
+typedef struct ast_production_head {
+  token_t token;
+} ast_production_head_t;
 
-enum ast_production_body_kind {
+typedef enum ast_production_body_kind {
   AST_PRODUCTION_BODY_KIND_LITERAL
-};
+} ast_production_body_kind_t;
 
-struct ast_production_body_literal {
-  struct token token;
-};
+typedef struct ast_production_body_literal {
+  token_t token;
+} ast_production_body_literal_t;
 
-union ast_production_body_data {
-  struct ast_production_body_literal literal;
-};
+typedef union ast_production_body_data {
+  ast_production_body_literal_t literal;
+} ast_production_body_data_t;
 
-struct ast_production_body {
-  enum ast_production_body_kind kind;
-  union ast_production_body_data data;
-};
+typedef struct ast_production_body {
+  ast_production_body_kind_t kind;
+  ast_production_body_data_t data;
+} ast_production_body_t;
 
-struct ast_production {
-  struct ast_production_head head;
-  struct ast_production_body body;
-};
+typedef struct ast_production {
+  ast_production_head_t head;
+  ast_production_body_t body;
+} ast_production_t;
 #endif
