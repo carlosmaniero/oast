@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "ref.h"
-#include "walker.h"
 #include "token.h"
+#include "assert.h"
 
-#ifndef LEXER_H
-#define LEXER_H
-
-typedef struct lexer
-{
-  walker_t walker;
-} lexer_t;
-
-void lexer_init(lexer_t* lexer, ref_source_t source);
-
-void lexer_next_token(lexer_t* lexer, token_t* token);
-
-#endif /* LEXER_H */
+char* token_kind_to_str(enum token_kind kind) {
+  switch (kind) {
+    case TOKEN_UNKNOWN: 
+      return "TOKEN_UNKNOWN";
+    case TOKEN_IDENTIFIER:
+      return "TOKEN_IDENTIFIER";
+    case TOKEN_EQUAL:
+      return "TOKEN_EQUAL";
+    case TOKEN_STRING:
+      return "TOKEN_STRING";
+    case TOKEN_EOF:
+      return "TOKEN_EOF";   
+  }
+  assert(0 && "lexer_token_kind_to_str: undefined token kind str");
+}

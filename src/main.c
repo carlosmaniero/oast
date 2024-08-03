@@ -106,7 +106,7 @@ void dump_tokens(char* grammar_path) {
         token.ref.source.path,
         token.ref.cursor.row + 1,
         token.ref.cursor.col + 1,
-        lexer_token_kind_to_str(token.kind),
+        token_kind_to_str(token.kind),
         FMT_TOKEN_VALUE(token));
   }
 }

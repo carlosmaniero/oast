@@ -16,18 +16,30 @@
  */
 #include "ref.h"
 #include "walker.h"
-#include "token.h"
 
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef TOKEN_H
+#define TOKEN_H
 
-typedef struct lexer
+#define FMT_TOKEN_VALUE_FORMATER "%.*s"
+#define FMT_TOKEN_VALUE(sv) (int)(sv).length, (sv).ref.source.contents + (sv).ref.cursor.offset
+
+typedef enum token_kind
 {
-  walker_t walker;
-} lexer_t;
+    TOKEN_UNKNOWN,
 
-void lexer_init(lexer_t* lexer, ref_source_t source);
+    TOKEN_IDENTIFIER,
+    TOKEN_EQUAL,
+    TOKEN_STRING,
 
-void lexer_next_token(lexer_t* lexer, token_t* token);
+    TOKEN_EOF
+} token_kind_t;
 
+typedef struct token
+{
+    enum token_kind kind;
+    size_t length;
+    ref_t ref;
+} token_t;
+
+char* token_kind_to_str(token_kind_t kind);
 #endif /* LEXER_H */

@@ -102,19 +102,3 @@ void lexer_next_token(lexer_t* lexer, token_t* token) {
   walker_walk_while(&lexer->walker, &lexer_not_space_predicate);
   lexer_set_token_length(lexer, token);
 }
-
-char* lexer_token_kind_to_str(enum token_kind kind) {
-  switch (kind) {
-    case TOKEN_UNKNOWN: 
-      return "TOKEN_UNKNOWN";
-    case TOKEN_IDENTIFIER:
-      return "TOKEN_IDENTIFIER";
-    case TOKEN_EQUAL:
-      return "TOKEN_EQUAL";
-    case TOKEN_STRING:
-      return "TOKEN_STRING";
-    case TOKEN_EOF:
-      return "TOKEN_EOF";   
-  }
-  assert(0 && "lexer_token_kind_to_str: undefined token kind str");
-}
