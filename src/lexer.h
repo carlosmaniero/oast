@@ -17,16 +17,18 @@
 #include "ref.h"
 #include "walker.h"
 #include "token.h"
+#include "symbol_table.h"
 
 #ifndef LEXER_H
 #define LEXER_H
 
 typedef struct lexer
 {
+  symbol_table_t* symbol_table;
   walker_t walker;
 } lexer_t;
 
-void lexer_init(lexer_t* lexer, ref_source_t source);
+void lexer_init(lexer_t* lexer, symbol_table_t* symbol_table, ref_source_t source);
 
 void lexer_next_token(lexer_t* lexer, token_t* token);
 

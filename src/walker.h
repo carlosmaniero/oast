@@ -35,4 +35,8 @@ void walker_walk_while(walker_t* walker, walker_predicate_t predicate);
 
 void walker_next_cursor(walker_t* walker);
 
+void walker_next_ncursor(walker_t* walker, size_t n);
+
+int walker_done(walker_t* walker);
+
 #endif

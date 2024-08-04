@@ -21,11 +21,13 @@
 #include "lexer.h"
 #include "parser.h"
 #include "ref.h"
+#include "emitter.h"
 
 void print_help(void);
 void print_unknown();
 void dump_tokens(char* grammar_path);
 void dump_ast(char* grammar_path);
+void check(char* grammar_path, char* source_path);
 char* load_file(arena_t* arena, char* file_path);
 
 int main(int args, char** argsv) {
@@ -44,6 +46,11 @@ int main(int args, char** argsv) {
     return 0;
   }
 
+  if (args > 3 && strcmp(argsv[1], "check") == 0) {
+    check(argsv[2], argsv[3]);
+    return 0;
+  }
+
   print_unknown();
   return 1;
 }
@@ -58,11 +65,14 @@ void dump_ast(char* grammar_path) {
 
   lexer_t lexer;
 
-  lexer_init(&lexer, source);
+  symbol_table_t symbol_table;
+  symbol_table_init(&symbol_table, &arena);
+
+  lexer_init(&lexer, &symbol_table, source);
 
   parser_t parser;
 
-  parser_init(&parser, &arena);
+  parser_init(&parser, &symbol_table, &arena);
 
   ast_t* ast = parser_parse(&parser, &lexer);
 
@@ -94,7 +104,10 @@ void dump_tokens(char* grammar_path) {
 
   lexer_t lexer;
 
-  lexer_init(&lexer, source);
+  symbol_table_t symbol_table;
+  symbol_table_init(&symbol_table, &arena);
+
+  lexer_init(&lexer, &symbol_table, source);
 
   token_t token = {0};
 
@@ -108,6 +121,47 @@ void dump_tokens(char* grammar_path) {
         token.ref.cursor.col + 1,
         token_kind_to_str(token.kind),
         FMT_TOKEN_VALUE(token));
+  }
+}
+
+void check(char* grammar_path, char* source_path) {
+  arena_t arena = arena_new(1024 * 1024 * 4);
+
+  ref_source_t grammar_source = {
+    .path = grammar_path,
+    .contents = load_file(&arena, grammar_path),
+  };
+
+  lexer_t lexer;
+
+  symbol_table_t symbol_table;
+  symbol_table_init(&symbol_table, &arena);
+
+  lexer_init(&lexer, &symbol_table, grammar_source);
+
+  parser_t parser;
+
+  parser_init(&parser, &symbol_table, &arena);
+
+  ast_t* ast = parser_parse(&parser, &lexer);
+
+  ref_source_t source = {
+    .path = grammar_path,
+    .contents = load_file(&arena, source_path),
+  };
+
+  emitter_t emitter;
+
+  emitter_init(&emitter, ast, source, &arena);
+
+  emitter_production_t* production;
+
+  while((production = emitter_emit(&emitter))) {
+    if (production->has_error) {
+      puts("invalid syntax");
+      exit(1);
+    }
+    puts(production->value);
   }
 }
 

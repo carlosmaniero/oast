@@ -60,6 +60,16 @@ void walker_next_cursor(walker_t* walker) {
   walker->ref.cursor.offset++;
 }
 
+void walker_next_ncursor(walker_t* walker, size_t n) {
+  while(n-- > 0) {
+    walker_next_cursor(walker);
+  }
+}
+
 void walker_cursor_to_ref(walker_t* walker, ref_t* ref) {
   *ref = walker->ref;
+}
+
+int walker_done(walker_t* walker) {
+  return ref_char(&walker->ref) == 0;
 }

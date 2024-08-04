@@ -14,36 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#ifndef EMITTER_H
+#define EMITTER_H
+
 #include "ref.h"
-#include "walker.h"
+#include "ast.h"
+#include "arena.h"
 
-#ifndef TOKEN_H
-#define TOKEN_H
+typedef struct emitter {
+  walker_t walker;
+  ast_t* ast;
+  arena_t* arena;
+} emitter_t;
 
-#define FMT_TOKEN_VALUE_FORMATER "%.*s"
-#define FMT_TOKEN_VALUE(sv) (int)(sv).length, (sv).ref.source.contents + (sv).ref.cursor.offset
+typedef struct emitter_stack {
+  char* production_head;
+  struct emitter_stack* previous; 
+} emitter_stack_t;
 
-typedef enum token_kind
-{
-    TOKEN_UNKNOWN,
+typedef struct emitter_production {
+  ref_t ref;
+  char* value;
+  emitter_stack_t* stack;
 
-    TOKEN_IDENTIFIER,
-    TOKEN_EQUAL,
-    TOKEN_STRING,
+  // TODO: think a better approach for error handling
+  int has_error;
+} emitter_production_t;
 
-    TOKEN_EOF
-} token_kind_t;
+void emitter_init(emitter_t* emitter, ast_t* ast, ref_source_t source, arena_t* arena);
 
-typedef struct token
-{
-    enum token_kind kind;
-    size_t length;
-    ref_t ref;
-} token_t;
+emitter_production_t* emitter_emit(emitter_t* emitter); 
 
-char* token_kind_to_str(token_kind_t kind);
-
-int token_value_size(token_t* token);
-void token_get_value(token_t* token, char* dest);
-
-#endif /* LEXER_H */
+#endif

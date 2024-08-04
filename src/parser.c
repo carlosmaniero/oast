@@ -15,9 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "parser.h"
+#include <assert.h>
 
-void parser_init(parser_t* parser, arena_t* arena) {
+static void parse_set_literal_value(parser_t* parser, ast_production_body_literal_t* literal);
+
+void parser_init(parser_t* parser, symbol_table_t* symbol_table, arena_t* arena) {
   parser->arena = arena;
+  parser->symbol_table = symbol_table;
 }
 
 ast_t* parser_parse(parser_t* parser, lexer_t* lexer) {
@@ -36,8 +40,32 @@ ast_t* parser_parse(parser_t* parser, lexer_t* lexer) {
   lexer_next_token(lexer, &production->body.data.literal.token);
 
   lexer_next_token(lexer, &production->body.data.literal.token);
+  parse_set_literal_value(parser, &production->body.data.literal);
+
+  symbol_table_add_production(parser->symbol_table, production);
 
   list_append(&root->productions, production);
 
   return root;
+}
+
+static void parse_set_literal_value(parser_t* parser, ast_production_body_literal_t* literal) {
+  char value[token_value_size(&literal->token)];
+  char* pvalue = value;
+
+  token_get_value(&literal->token, value);
+
+  char* actual_value = literal->value = arena_alloc(parser->arena, token_value_size(&literal->token));
+
+  assert(*pvalue == '"' && "parse_set_literal_value: invalid token literal");
+
+  pvalue++;
+
+  while(*pvalue != '"') {
+    // TODO: allow escaped strings
+    *actual_value = *pvalue;
+    actual_value++;
+
+     pvalue++;
+  }
 }

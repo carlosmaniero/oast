@@ -32,3 +32,12 @@ char* token_kind_to_str(enum token_kind kind) {
   }
   assert(0 && "lexer_token_kind_to_str: undefined token kind str");
 }
+
+int token_value_size(token_t* token) {
+  return token->length + 1;
+}
+
+void token_get_value(token_t* token, char* dest) {
+  dest[token->length] = 0;
+  ref_source_to_str(&token->ref, dest, token->length);
+}

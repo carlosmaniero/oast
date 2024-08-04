@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "list.h"
+#include "token.h"
 #ifndef AST_H
 #define AST_H
 typedef struct ast {
@@ -32,6 +33,7 @@ typedef enum ast_production_body_kind {
 
 typedef struct ast_production_body_literal {
   token_t token;
+  char* value;
 } ast_production_body_literal_t;
 
 typedef union ast_production_body_data {

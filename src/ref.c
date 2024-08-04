@@ -20,6 +20,14 @@ char ref_char(ref_t* ref) {
   return *(ref->source.contents + ref->cursor.offset);
 }
 
+char* ref_source_contents_at_cursor(ref_t* ref) {
+  return ref->source.contents + ref->cursor.offset;
+}
+
+void ref_source_to_str(ref_t* ref, char* dest, size_t length) {
+  memcpy(dest, ref->source.contents + ref->cursor.offset, length);
+}
+
 int ref_distance(ref_t* ref, ref_t* other) {
   return ref->cursor.offset - other->cursor.offset;
 }

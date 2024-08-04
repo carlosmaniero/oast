@@ -20,10 +20,11 @@
 #ifndef PARSER_H
 #define PARSER_H
 typedef struct parser {
+  symbol_table_t* symbol_table;
   arena_t* arena;
 } parser_t;
 
-void parser_init(parser_t* parser, arena_t* arena);
+void parser_init(parser_t* parser, symbol_table_t* symbol_table, arena_t* arena);
 
 ast_t* parser_parse(parser_t* parser, lexer_t* lexer);
 

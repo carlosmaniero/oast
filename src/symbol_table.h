@@ -14,36 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "ref.h"
-#include "walker.h"
+#include "arena.h"
+#include "list.h"
+#include "map.h"
+#include "token.h"
+#include "ast.h"
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
 
-#ifndef TOKEN_H
-#define TOKEN_H
+typedef struct symbol_table_item {
+  char* identifier;
+  list_t* productions;
+} symbol_table_item_t;
 
-#define FMT_TOKEN_VALUE_FORMATER "%.*s"
-#define FMT_TOKEN_VALUE(sv) (int)(sv).length, (sv).ref.source.contents + (sv).ref.cursor.offset
+typedef struct symbol_table {
+  map_t* map;
+  arena_t* arena;
+} symbol_table_t;
 
-typedef enum token_kind
-{
-    TOKEN_UNKNOWN,
+void symbol_table_init(symbol_table_t* symble_table, arena_t* arena);
+void symbol_table_register_identifier(symbol_table_t* symble_table, token_t* token);
+void symbol_table_add_production(symbol_table_t* symble_table, ast_production_t* production);
 
-    TOKEN_IDENTIFIER,
-    TOKEN_EQUAL,
-    TOKEN_STRING,
-
-    TOKEN_EOF
-} token_kind_t;
-
-typedef struct token
-{
-    enum token_kind kind;
-    size_t length;
-    ref_t ref;
-} token_t;
-
-char* token_kind_to_str(token_kind_t kind);
-
-int token_value_size(token_t* token);
-void token_get_value(token_t* token, char* dest);
-
-#endif /* LEXER_H */
+#endif

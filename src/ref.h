@@ -39,6 +39,9 @@ typedef struct ref {
 
 char ref_char(ref_t* ref);
 
+char* ref_source_contents_at_cursor(ref_t* ref);
+void ref_source_to_str(ref_t* ref, char* dest, size_t length);
+
 int ref_distance(ref_t* ref, ref_t* other);
 
 #endif

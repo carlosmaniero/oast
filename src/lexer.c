@@ -26,7 +26,8 @@ int lexer_isalnum(ref_t* ref);
 
 void lexer_set_token_length(lexer_t* lexer, token_t* token);
 
-void lexer_init(lexer_t* lexer, ref_source_t source) {
+void lexer_init(lexer_t* lexer, symbol_table_t* symbol_table, ref_source_t source) {
+  lexer->symbol_table = symbol_table;
   walker_init(&lexer->walker, source);
 }
 
@@ -96,6 +97,7 @@ void lexer_next_token(lexer_t* lexer, token_t* token) {
 
     token->kind = TOKEN_IDENTIFIER;
     lexer_set_token_length(lexer, token);
+    symbol_table_register_identifier(lexer->symbol_table, token);
     return;
   }
 
