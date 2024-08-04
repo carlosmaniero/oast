@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "parser.h"
+#include "stdio.h"
 #include <assert.h>
 
 static void parse_set_literal_value(parser_t* parser, ast_production_body_literal_t* literal);
@@ -27,22 +28,38 @@ void parser_init(parser_t* parser, symbol_table_t* symbol_table, arena_t* arena)
 ast_t* parser_parse(parser_t* parser, lexer_t* lexer) {
   ast_t* root = arena_alloc(parser->arena, sizeof(ast_t));
 
-  root->productions = (list_t){0};
-  root->productions.arena = parser->arena;
-
   ast_production_t* production = arena_alloc(parser->arena, sizeof(ast_production_t));
 
   lexer_next_token(lexer, &production->head.token);
-  production->body.kind = AST_PRODUCTION_BODY_KIND_LITERAL;
+
+  list_init(&root->productions, parser->arena);
+  list_init(&production->body, parser->arena);
 
   // TODO: ensure there is an = token in between head and body
   // At this point we are only consuming it
-  lexer_next_token(lexer, &production->body.data.literal.token);
+  token_t assign_token;
+  lexer_next_token(lexer, &assign_token);
 
-  lexer_next_token(lexer, &production->body.data.literal.token);
-  parse_set_literal_value(parser, &production->body.data.literal);
+  token_t body_token;
 
-  symbol_table_add_production(parser->symbol_table, production);
+  while (1) {
+    lexer_next_token(lexer, &body_token);
+
+    if (body_token.kind == TOKEN_EOF) {
+      break;
+    }
+
+    ast_production_body_t* body = arena_alloc(parser->arena, sizeof(ast_production_body_t));
+
+    body->kind = AST_PRODUCTION_BODY_KIND_LITERAL;
+
+    body->data.literal.token = body_token;
+    parse_set_literal_value(parser, &body->data.literal);
+
+    symbol_table_add_production(parser->symbol_table, production);
+
+    list_append(&production->body, body);
+  }
 
   list_append(&root->productions, production);
 

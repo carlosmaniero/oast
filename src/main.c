@@ -83,7 +83,15 @@ void dump_ast(char* grammar_path) {
   while (item) {
     ast_production_t* production = item->value;
     printf("\n- "FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->head.token));
-    printf("\n  - LITERAL:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->body.data.literal.token));
+
+    list_item_t* body_item = list_head(&production->body);
+
+    while (body_item) {
+      ast_production_body_t* body = body_item->value;
+      // TODO: evaluate the production type other than assuming it is a literal
+      printf("\n  - LITERAL:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(body->data.literal.token));
+      body_item = list_next(body_item);
+    }
 
     printf("\n");
     item = list_next(item);

@@ -39,16 +39,19 @@ emitter_production_t* emitter_emit(emitter_t* emitter) {
 
   emitter_production_t* result = arena_alloc(emitter->arena, sizeof(emitter_production_t));
 
-  switch(ast_production->body.kind) {
+  // TODO: it should walk though the ast
+  ast_production_body_t* body = list_head(&ast_production->body)->value;
+
+  switch(body->kind) {
     case AST_PRODUCTION_BODY_KIND_LITERAL: {
       if(strncmp(
-          ast_production->body.data.literal.value,
+          body->data.literal.value,
           ref_source_contents_at_cursor(&emitter->walker.ref),
-          strlen(ast_production->body.data.literal.value)) == 0) {
-        result->value = arena_alloc(emitter->arena, ast_production->body.data.literal.token.length);
-        ref_source_to_str(&emitter->walker.ref, result->value, ast_production->body.data.literal.token.length);
+          strlen(body->data.literal.value)) == 0) {
+        result->value = arena_alloc(emitter->arena, body->data.literal.token.length);
+        ref_source_to_str(&emitter->walker.ref, result->value, body->data.literal.token.length);
 
-        walker_next_ncursor(&emitter->walker, ast_production->body.data.literal.token.length);
+        walker_next_ncursor(&emitter->walker, body->data.literal.token.length);
       } else {
         result->has_error = 1;
       }

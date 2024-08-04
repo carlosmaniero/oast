@@ -47,6 +47,7 @@ typedef struct ast_production_body {
 
 typedef struct ast_production {
   ast_production_head_t head;
-  ast_production_body_t body;
+  // List of ast_production_body
+  list_t body;
 } ast_production_t;
 #endif
