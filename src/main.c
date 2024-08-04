@@ -76,18 +76,14 @@ void dump_ast(char* grammar_path) {
 
   ast_t* ast = parser_parse(&parser, &lexer);
 
-  puts("AST");
+  printf("AST");
 
   list_item_t* item = list_head(&ast->productions);
 
   while (item) {
     ast_production_t* production = item->value;
-    printf("- PRODUCTION:");
-
-    printf("\n  - HEAD:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->head.token));
-    printf("\n  - BODY:");
-    printf("\n    - KIND:LITERAL");
-    printf("\n    - VALUE:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->body.data.literal.token));
+    printf("\n- "FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->head.token));
+    printf("\n  - LITERAL:"FMT_TOKEN_VALUE_FORMATER, FMT_TOKEN_VALUE(production->body.data.literal.token));
 
     printf("\n");
     item = list_next(item);

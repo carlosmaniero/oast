@@ -20,8 +20,5 @@ answer0 = "42"
 % expect-token %examples/01-single-literal.oast:16:11:TOKEN_STRING:"42"
 
 % ast %AST
-% ast %- PRODUCTION:
-% ast %  - HEAD:answer0
-% ast %  - BODY:
-% ast %    - KIND:LITERAL
-% ast %    - VALUE:"42"
+% ast %- answer0
+% ast %  - LITERAL:"42"
