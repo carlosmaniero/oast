@@ -46,6 +46,20 @@ void walker_walk_while(walker_t* walker, walker_predicate_t predicate) {
   }
 }
 
+void walker_ctx_walk_while(walker_t* walker, walker_ctx_predicate_t predicate, void* context) {
+  ref_t ref;
+
+  while(1) {
+    walker_cursor_to_ref(walker, &ref);
+
+    if (!predicate(&ref, context) || ref_char(&ref) == 0) {
+      break;
+    }
+
+    walker_next_cursor(walker);
+  }
+}
+
 void walker_next_cursor(walker_t* walker) {
   ref_t ref;
   walker_cursor_to_ref(walker, &ref);

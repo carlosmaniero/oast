@@ -20,7 +20,7 @@
 
 int lexer_not_space_predicate(ref_t* ref);
 int lexer_not_lf(ref_t* ref);
-int lexer_not_dquote(ref_t* ref);
+int lexer_not_dquote(ref_t* ref, int* escaping);
 int lexer_isspace_predicate(ref_t* ref);
 int lexer_isalnum(ref_t* ref);
 
@@ -43,8 +43,20 @@ int lexer_not_lf(ref_t* ref) {
   return ref_char(ref) != '\n';
 }
 
-int lexer_not_dquote(ref_t* ref) {
-  return ref_char(ref) != '"';
+int lexer_not_dquote(ref_t* ref, int* escaping) {
+  char c = ref_char(ref);
+
+  if (*escaping == 0 && c == '\\') {
+    *escaping = 1;
+    return 1;
+  }
+
+  if (*escaping) {
+    *escaping = 0;
+    return 1;
+  }
+
+  return c != '"';
 }
 
 int lexer_isalnum(ref_t* ref) {
@@ -82,7 +94,8 @@ void lexer_next_token(lexer_t* lexer, token_t* token) {
   if (token_char == '"') {
     token->kind = TOKEN_STRING;
 
-    walker_walk_while(&lexer->walker, &lexer_not_dquote);
+    int escaping = 0;
+    walker_ctx_walk_while(&lexer->walker, (walker_ctx_predicate_t)&lexer_not_dquote, &escaping);
     walker_next_cursor(&lexer->walker);
 
     // TODO: it is assuming the string is always valid

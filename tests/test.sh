@@ -105,7 +105,7 @@ expect_output() {
   fi
 
   while read -r expected_line ; do
-    if [ "$(grep "$expected_line" "$actual_file" | wc -c)" = "0" ]; then
+    if [ "$(grep "$(printf "%s" "$expected_line" | sed 's/\\/\\\\/g')" "$actual_file" | wc -c)" = "0" ]; then
       print_failed "$context"
       colored "(not found) $expected_line" $COLOR_YELLOW
       echo ""

@@ -30,8 +30,11 @@ void walker_init(walker_t* walker, ref_source_t source);
 void walker_walk(walker_t* walker, ref_t* ref);
 
 typedef int (*walker_predicate_t)(ref_t* ref);
+typedef int (*walker_ctx_predicate_t)(ref_t* ref, void* ctx);
 
 void walker_walk_while(walker_t* walker, walker_predicate_t predicate);
+
+void walker_ctx_walk_while(walker_t* walker, walker_ctx_predicate_t predicate, void* ctx);
 
 void walker_next_cursor(walker_t* walker);
 
