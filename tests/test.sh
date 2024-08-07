@@ -18,20 +18,6 @@ TEST_FILE="$1"
 
 TEST_TMP_FILES="$TEST_FILE.test"
 
-AST_OUTPUT_FILE="$TEST_FILE.test.ast_output"
-AST_EXPECT_OUTPUT_FILE="$TEST_FILE.test.expected_ast_output"
-
-TOKENS_OUTPUT_FILE="$TEST_FILE.test.tokens_output"
-TOKENS_EXPECT_OUTPUT_FILE="$TEST_FILE.test.expected_tokens_output"
-
-# Misc
-extract_comment() {
-  tag="$1"
-  comment="% $tag %"
-
-  grep "$comment" "$TEST_FILE" | sed -e "s/$comment//"
-}
-
 cleanup() {
   rm -f "$TEST_TMP_FILES"*
 }
@@ -59,16 +45,18 @@ colored() {
     printf "%s" "$text"
 }
 
-print_test_description() {
+# test output
+test_header() {
+  colored "$1" "$COLOR_GRAY"
+  printf "\n"
+}
+
+print_test_path() {
   colored "$TEST_FILE: " $COLOR_CYAN
   printf "\n"
-  colored "$(extract_comment spec)" $COLOR_GRAY
-  printf "\n\n"
 }
 
 print_passed() {
-  context="$1"
-  printf "%s: " "$context"
   colored "passed" $COLOR_GREEN
   echo
 }
@@ -80,14 +68,8 @@ print_failed() {
   echo
 }
 
-print_skiped() {
-  context="$1"
-  printf "%s: " "$context"
-  colored "not set" $COLOR_GRAY
-  echo
-}
-
-expect_output() {
+# expectations
+expect_output_contains() {
   context="$1"
   actual_file="$2"
   expected_file="$3"
@@ -95,13 +77,6 @@ expect_output() {
   if [ "$(wc -l < "$expected_file")" = "0" ]; then
     print_skiped "$context"
     return
-  fi
-
-  if [ "$(cat "$expected_file")" = "%empty%" ]; then
-    if [ "$(wc -c < "$actual_file")" = "0" ]; then
-      print_passed "$context"
-      return
-    fi
   fi
 
   while read -r expected_line ; do
@@ -130,44 +105,65 @@ diff_output() {
     return
   fi
 
-  if [ "$(cat "$expected_file")" = "%empty%" ]; then
-    if [ "$(wc -c < "$actual_file")" = "0" ]; then
-       return
-    fi
-  fi
-
   colored "$context not match:" $COLOR_YELLOW
   echo ""
   diff "$actual_file" "$expected_file" -u --color
   exit 1
 }
 
-test_tokens() {
-  extract_comment "expect-token" > "$TOKENS_EXPECT_OUTPUT_FILE"
-
-  $OAST_PATH dump-tokens "$TEST_FILE" > "$TOKENS_OUTPUT_FILE" 2>&1
-
-  expect_output "expect-token" "$TOKENS_OUTPUT_FILE" "$TOKENS_EXPECT_OUTPUT_FILE"
-
-  print_passed expect-token
+# test function
+spec() {
+  test_header spec
+  cat "$1"
 }
 
-test_ast() {
-  extract_comment "ast" > "$AST_EXPECT_OUTPUT_FILE"
-
-  $OAST_PATH dump-ast "$TEST_FILE" > "$AST_OUTPUT_FILE" 2>&1
-
-  diff_output "ast" "$AST_OUTPUT_FILE" "$AST_EXPECT_OUTPUT_FILE"
-
-  print_passed ast
+describe() {
+  echo
+  test_header describe
+  cat "$1"
 }
 
+ast_equals() {
+  actual_path="$1.actual"
+  $OAST_PATH dump-ast "$TEST_FILE" > "$actual_path" 2>&1
+
+  diff_output "$TEST_FILE:$2:1:ast_equals" "$actual_path" "$1"
+
+  print_passed
+}
+
+expect_contains_tokens() {
+  actual_path="$1.actual"
+  $OAST_PATH dump-tokens "$TEST_FILE" > "$actual_path" 2>&1
+
+  expect_output_contains "$TEST_FILE:$2:1:expect_contains_tokens" "$actual_path" "$1"
+
+  print_passed
+}
 
 main() {
-  print_test_description
+  print_test_path
 
-  test_tokens
-  test_ast
+  all_test_end="$(grep -n "END" "$TEST_FILE" | awk -F: '{print $1}')"
+
+  grep -n "%TEST:" "$TEST_FILE" | while read -r line ; do
+    start_line="$(echo "$line" | awk -F: '{ print $1 }')"
+    test_name="$(echo "$line" | awk -F: '{ print $3 }')"
+    end_line="$start_line"
+
+    for test_end in $all_test_end; do
+      if [ "$test_end" -gt "$start_line" ]; then
+        end_line="$test_end"
+        break
+      fi
+    done
+
+    test_contents_path="$TEST_TMP_FILES.$start_line.$end_line.partial"
+
+    awk -v start="$start_line" -v end="$end_line" 'NR > start && NR < end' "$TEST_FILE" | sed 's/^\%//' > "$test_contents_path"
+
+    "$test_name" "$test_contents_path" "$start_line"
+  done
 
   cleanup
 }

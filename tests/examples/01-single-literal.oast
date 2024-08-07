@@ -12,13 +12,29 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
-% spec %A simple grammar that only accepts 42
+
+%TEST:spec
+%A single grammar that only accepts 42 as answer.
+%END
+
 answer0 = "42"
 
-% expect-token %examples/01-single-literal.oast:16:1:TOKEN_IDENTIFIER:answer0
-% expect-token %examples/01-single-literal.oast:16:9:TOKEN_EQUAL:=
-% expect-token %examples/01-single-literal.oast:16:11:TOKEN_STRING:"42"
+%TEST:describe
+%it recognizes identifier that contains numbers.
+%END
 
-% ast %AST
-% ast %- answer0
-% ast %  - LITERAL:"42"
+%TEST:expect_contains_tokens
+%examples/01-single-literal.oast:20:1:TOKEN_IDENTIFIER:answer0
+%examples/01-single-literal.oast:20:9:TOKEN_EQUAL:=
+%examples/01-single-literal.oast:20:11:TOKEN_STRING:"42"
+%END
+
+%TEST:describe
+%produces an AST with a single production.
+%END
+
+%TEST:ast_equals
+%AST
+%- answer0
+%  - LITERAL:"42"
+%END

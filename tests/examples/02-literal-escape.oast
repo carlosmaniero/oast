@@ -12,17 +12,29 @@
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <https://www.gnu.org/licenses/>.
-% spec %Ensure that escaped strings works properly
+%TEST:spec
+%A grammar with many escaped string literals
+%END
 answer = "\"quote me\"" "\\" "\n"
 
-% expect-token %examples/02-literal-escape.oast:16:1:TOKEN_IDENTIFIER:answer
-% expect-token %examples/02-literal-escape.oast:16:8:TOKEN_EQUAL:=
-% expect-token %examples/02-literal-escape.oast:16:10:TOKEN_STRING:"\"quote me\""
-% expect-token %examples/02-literal-escape.oast:16:25:TOKEN_STRING:"\\"
-% expect-token %examples/02-literal-escape.oast:16:30:TOKEN_STRING:"\n"
+%TEST:describe
+%all tokens are properly escaped.
+%END
+%TEST:expect_contains_tokens
+%examples/02-literal-escape.oast:18:1:TOKEN_IDENTIFIER:answer
+%examples/02-literal-escape.oast:18:8:TOKEN_EQUAL:=
+%examples/02-literal-escape.oast:18:10:TOKEN_STRING:"\"quote me\""
+%examples/02-literal-escape.oast:18:25:TOKEN_STRING:"\\"
+%examples/02-literal-escape.oast:18:30:TOKEN_STRING:"\n"
+%END
 
-% ast %AST
-% ast %- answer
-% ast %  - LITERAL:"\"quote me\""
-% ast %  - LITERAL:"\\"
-% ast %  - LITERAL:"\n"
+%TEST:describe
+%produces an AST with many literal terminals.
+%END
+%TEST:ast_equals
+%AST
+%- answer
+%  - LITERAL:"\"quote me\""
+%  - LITERAL:"\\"
+%  - LITERAL:"\n"
+%END
