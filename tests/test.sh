@@ -162,8 +162,17 @@ main() {
 
     awk -v start="$start_line" -v end="$end_line" 'NR > start && NR < end' "$TEST_FILE" | sed 's/^\%//' > "$test_contents_path"
 
-    "$test_name" "$test_contents_path" "$start_line"
-  done
+    if type "$test_name" | grep -q 'function'; then
+        "$test_name" "$test_contents_path" "$start_line"
+    else
+        echo
+        colored "Test function" $COLOR_YELLOW
+        colored " \"$test_name\" " $COLOR_RED
+        colored "is not defined" $COLOR_YELLOW
+        echo
+        exit 1
+    fi
+  done || exit 1;
 
   cleanup
 }
