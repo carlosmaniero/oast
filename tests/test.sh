@@ -141,6 +141,15 @@ expect_contains_tokens() {
   print_passed
 }
 
+check_equals() {
+  actual_path="$1.actual"
+  $OAST_PATH check "$TEST_FILE" "$3" > "$actual_path" 2>&1
+
+  diff_output "$TEST_FILE:$2:1:check_equals" "$actual_path" "$1"
+
+  print_passed
+}
+
 main() {
   print_test_path
 
@@ -149,6 +158,7 @@ main() {
   grep -n "%TEST:" "$TEST_FILE" | while read -r line ; do
     start_line="$(echo "$line" | awk -F: '{ print $1 }')"
     test_name="$(echo "$line" | awk -F: '{ print $3 }')"
+    test_args="$(echo "$line" | awk -F: '{ print $4 }')"
     end_line="$start_line"
 
     for test_end in $all_test_end; do
@@ -163,7 +173,7 @@ main() {
     awk -v start="$start_line" -v end="$end_line" 'NR > start && NR < end' "$TEST_FILE" | sed 's/^\%//' > "$test_contents_path"
 
     if type "$test_name" | grep -q 'function'; then
-        "$test_name" "$test_contents_path" "$start_line"
+        "$test_name" "$test_contents_path" "$start_line" "$test_args"
     else
         echo
         colored "Test function" $COLOR_YELLOW

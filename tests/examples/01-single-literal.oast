@@ -38,3 +38,12 @@ answer0 = "42"
 %- answer0
 %  - LITERAL:"42"
 %END
+
+
+%TEST:describe
+%returns the found production
+%END
+
+%TEST:check_equals:./examples/01-single-literal-input.txt
+%42
+%END
