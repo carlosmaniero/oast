@@ -45,5 +45,5 @@ answer0 = "42"
 %END
 
 %TEST:check_equals:./examples/01-single-literal-input.txt
-%42
+%answer0:42
 %END

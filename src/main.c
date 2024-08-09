@@ -165,7 +165,8 @@ void check(char* grammar_path, char* source_path) {
       puts("invalid syntax");
       exit(1);
     }
-    puts(production->value);
+
+    printf("%s:%s\n", production->stack->production_head, production->value);
   }
 }
 

@@ -25,6 +25,18 @@ void emitter_init(emitter_t* emitter, ast_t* ast, ref_source_t source, arena_t* 
   walker_init(&emitter->walker, source);
 }
 
+static emitter_production_t* emitter_production_new(emitter_t* emitter, ast_production_t* ast_production) {
+  emitter_production_t* production_result = arena_alloc(emitter->arena, sizeof(emitter_production_t));
+
+  production_result->stack = arena_alloc(emitter->arena, sizeof(emitter_stack_t));
+  production_result->stack->production_head =
+    arena_alloc(emitter->arena, token_value_size(&ast_production->head.token));
+
+  token_get_value(&ast_production->head.token, production_result->stack->production_head);
+
+  return production_result;
+}
+
 emitter_production_t* emitter_emit(emitter_t* emitter) {
   if (walker_done(&emitter->walker)) {
     return NULL;
@@ -37,7 +49,7 @@ emitter_production_t* emitter_emit(emitter_t* emitter) {
 
   assert(item && "emitter_emit: empty ast production");
 
-  emitter_production_t* result = arena_alloc(emitter->arena, sizeof(emitter_production_t));
+  emitter_production_t* production_result = emitter_production_new(emitter, ast_production);
 
   // TODO: it should walk though the ast
   ast_production_body_t* body = list_head(&ast_production->body)->value;
@@ -48,12 +60,13 @@ emitter_production_t* emitter_emit(emitter_t* emitter) {
           body->data.literal.value,
           ref_source_contents_at_cursor(&emitter->walker.ref),
           strlen(body->data.literal.value)) == 0) {
-        result->value = arena_alloc(emitter->arena, body->data.literal.token.length);
-        ref_source_to_str(&emitter->walker.ref, result->value, body->data.literal.token.length);
+
+        production_result->value = arena_alloc(emitter->arena, body->data.literal.token.length);
+        ref_source_to_str(&emitter->walker.ref, production_result->value, body->data.literal.token.length);
 
         walker_next_ncursor(&emitter->walker, body->data.literal.token.length);
       } else {
-        result->has_error = 1;
+        production_result->has_error = 1;
       }
       break;
     }
@@ -61,5 +74,5 @@ emitter_production_t* emitter_emit(emitter_t* emitter) {
       assert(0 && "emitter_emit: unknown production kind");
   }
   
-  return result;
+  return production_result;
 }
